@@ -1,0 +1,39 @@
+table {
+  width: 100%;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.expired {
+  background-color: brown;
+}
+
+.w-1 {
+  width: 10%;
+}
+
+//
+
+table {
+  width: 100%;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+.element-detail {
+  overflow: hidden;
+  display: flex;
+}
+
+.bg-edit {
+  background: rgba(222, 184, 135, 0.5);
+}

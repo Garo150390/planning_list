@@ -1,0 +1,42 @@
+<form
+  [formGroup]="addPlanningForm"
+  (ngSubmit)="submitForm()"
+>
+<div class="flex ml-4 mt-5 pt-5">
+  <mat-form-field appearance="legacy">
+    <mat-label>title</mat-label>
+    <input formControlName="title" matInput>
+  </mat-form-field>
+  <mat-form-field appearance="legacy">
+    <mat-label>description</mat-label>
+    <input formControlName="description" matInput>
+  </mat-form-field>
+  <mat-form-field appearance="legacy">
+    <mat-label>place</mat-label>
+    <input formControlName="place" matInput>
+  </mat-form-field>
+  <mat-form-field appearance="legacy">
+    <mat-label>address</mat-label>
+    <input formControlName="address" matInput>
+  </mat-form-field>
+  <mat-form-field appearance="legacy">
+    <input matInput [ngxMatDatetimePicker]="picker" placeholder="Choose a date" formControlName="date"
+           [min]="minDate" [max]="maxDate" [disabled]="disabled">
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <ngx-mat-datetime-picker #picker
+                             [showSpinners]="showSpinners"
+                             [showSeconds]="showSeconds"
+                             [stepHour]="stepHour"
+                             [stepMinute]="stepMinute"
+                             [stepSecond]="stepSecond"
+                             [touchUi]="touchUi"
+                             [color]="color"
+                             [enableMeridian]="enableMeridian"
+                             [disableMinute]="disableMinute"
+                             [hideTime]="hideTime">
+    </ngx-mat-datetime-picker>
+  </mat-form-field>
+  <button type="submit" mat-raised-button color="primary">Add</button>
+
+</div>
+</form>

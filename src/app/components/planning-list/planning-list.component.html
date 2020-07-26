@@ -1,0 +1,187 @@
+<app-planning-form (planningData)="addPlanningData($event)"></app-planning-form>
+
+<div class="col-10 border p-3">
+
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+  </mat-form-field>
+
+  <table mat-table
+         [dataSource]="dataSource"
+         matSort
+         multiTemplateDataRows
+         #planningTable
+         class="mat-table cdk-table mat-elevation-z8">
+
+    <!-- title Column -->
+    <ng-container matColumnDef="title">
+      <th width="200" mat-header-cell *matHeaderCellDef> title </th>
+      <td mat-cell *matCellDef="let element"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <input *ngIf="element.edit; else titleBlock"
+               data-name="delete"
+               matInput
+               [(ngModel)]="title">
+        <ng-template #titleBlock>{{element.title}}</ng-template>
+      </td>
+    </ng-container>
+
+    <!-- status Column -->
+    <ng-container matColumnDef="status">
+      <th width="200" mat-header-cell *matHeaderCellDef mat-sort-header> status </th>
+      <td mat-cell *matCellDef="let element"
+          [style.color]="COLORS[element.status]"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <div *ngIf="element.edit; else statusBlock"
+             data-name="delete">
+          <mat-form-field appearance="legacy">
+            <mat-select [(value)]="status">
+              <mat-option *ngFor="let option of options" [value]="option">{{option}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <ng-template #statusBlock>{{element.status}}</ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="place">
+      <th width="200" mat-header-cell *matHeaderCellDef mat-sort-header> place </th>
+      <td mat-cell *matCellDef="let element"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <input *ngIf="element.edit; else placeBlock"
+               data-name="delete"
+               matInput
+               [(ngModel)]="place">
+        <ng-template #placeBlock>{{element.place}}</ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="address">
+      <th width="200" mat-header-cell *matHeaderCellDef mat-sort-header> address </th>
+      <td mat-cell *matCellDef="let element"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <input *ngIf="element.edit; else addressBlock"
+               data-name="delete"
+               matInput
+               [(ngModel)]="address">
+        <ng-template #addressBlock>{{element.address}}</ng-template>
+      </td>
+    </ng-container>
+
+    <!-- date Column -->
+    <ng-container matColumnDef="date">
+      <th width="200" mat-header-cell *matHeaderCellDef mat-sort-header> date </th>
+      <td mat-cell *matCellDef="let element"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <mat-form-field
+          *ngIf="element.edit; else dateBlock"
+          data-name="delete"
+          appearance="legacy">
+          <input matInput [ngxMatDatetimePicker]="picker" placeholder="Choose a date" [(ngModel)]="date"
+                 [min]="minDate" [max]="maxDate" [disabled]="disabled">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <ngx-mat-datetime-picker #picker
+                                   [showSpinners]="showSpinners"
+                                   [showSeconds]="showSeconds"
+                                   [stepHour]="stepHour"
+                                   [stepMinute]="stepMinute"
+                                   [stepSecond]="stepSecond"
+                                   [touchUi]="touchUi"
+                                   [color]="color"
+                                   [enableMeridian]="enableMeridian"
+                                   [disableMinute]="disableMinute"
+                                   [hideTime]="hideTime">
+          </ngx-mat-datetime-picker>
+        </mat-form-field>
+        <!--<input *ngIf="element.edit; else dateBlock"
+               data-name="delete"
+               matInput
+               [(ngModel)]="date">-->
+        <ng-template #dateBlock>{{parseToDate(element.date) | dfnsFormat: 'yyyy-MM-dd HH:ss'}}</ng-template>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+        <div class="element-detail"
+             [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+          <input *ngIf="element.edit; else descriptionBlock"
+                 data-name="delete"
+                 matInput
+                 [(ngModel)]="description">
+          <ng-template #descriptionBlock><p>{{element.description}}</p></ng-template>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+      <th width="40" mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell
+          *matCellDef="let element"
+          data-name="delete"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <mat-icon
+          class="btn btn-danger p-0"
+          data-name="delete"
+          aria-hidden="false"
+          (click)="deleteData(element)"
+          title="Delete"
+        >delete</mat-icon>
+<!--        <button class="btn btn-danger p-0" name="delete"-->
+<!--                (click)="deleteData(element)"-->
+<!--        >Delete</button>-->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="done">
+      <th mat-header-cell *matHeaderCellDef class="w-1"></th>
+      <td mat-cell
+          *matCellDef="let element"
+          data-name="delete"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <mat-icon
+          class="btn btn-success p-0"
+          data-name="delete"
+          (click)="element.status = 'done'"
+          *ngIf="element.status === 'placed'"
+          aria-hidden="false"
+          title="Done"
+        >done</mat-icon>
+        <!--<button class="btn btn-success p-0" name="delete"
+                (click)="element.status = 'done'"
+                *ngIf="element.status === 'placed'"
+        >Done</button>-->
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="edit">
+      <th width="40" mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell
+          *matCellDef="let element"
+          data-name="delete"
+          [ngClass]="{expired: element.status === 'expired' && !element.edit }">
+        <mat-icon
+          (click)="saveData(element)"
+          class="btn p-0" data-name="delete"
+          [ngClass]="element.edit ? 'btn-primary' : 'btn-warning'"
+          [title]="element.edit ? 'save' : 'edit'"
+          aria-hidden="false"
+        >{{element.edit ? 'save' : 'edit' }}</mat-icon>
+        <!--<button class="btn btn-success p-0" name="delete"
+                (click)="element.status = 'done'"
+                *ngIf="element.status === 'placed'"
+        >Done</button>-->
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let element; columns: displayedColumns;"
+        [class.expanded-row]="expandedElement === element"
+        [class.bg-edit]="element.edit"
+        (click)="expand($event, element)">
+    </tr>
+    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+  </table>
+
+</div>
